@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.server.models import models
 from fastapi import FastAPI
+from app.server.redis import redis_client
 
 from app.server.routers import bikes
 
@@ -15,6 +16,11 @@ logger = logging.getLogger(
 app = FastAPI()
 
 app.include_router(bikes.router)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    redis_client.close()
 
 
 @app.get("/")
